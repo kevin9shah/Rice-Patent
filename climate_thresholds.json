@@ -1,0 +1,17 @@
+{
+  "rainfall": {
+    "instability_threshold": 46.935728961555554,
+    "warning_start": 42.242156065399996
+  },
+  "avg_temperature": {
+    "instability_threshold": 24.968510098383838,
+    "warning_start": 22.471659088545454
+  },
+  "sunshine_duration": {
+    "instability_threshold": 3.537927178828283,
+    "warning_start": 3.184134460945455
+  },
+  "avg_humidity": {
+    "instability_threshold": null
+  }
+}

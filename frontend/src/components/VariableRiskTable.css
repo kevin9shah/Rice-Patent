@@ -1,0 +1,61 @@
+.variable-risk-table {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.variable-risk-table h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.variable-risk-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.variable-risk-table thead {
+  background: #f8f9fa;
+}
+
+.variable-risk-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.variable-risk-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.variable-risk-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.variable-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reason-text {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
