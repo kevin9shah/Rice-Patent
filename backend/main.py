@@ -7,13 +7,18 @@ import numpy as np
 from pathlib import Path
 import joblib
 import warnings
+import os
 
 app = FastAPI(title="Rice Climate Risk Intelligence API")
 
 # Enable CORS for frontend
+# In production, set CORS_ORIGINS env var to your Vercel domain (comma-separated)
+# Example: CORS_ORIGINS=https://your-app.vercel.app,https://www.your-app.vercel.app
+cors_origins_env = os.getenv("CORS_ORIGINS", "*")
+cors_origins = ["*"] if cors_origins_env == "*" else [origin.strip() for origin in cors_origins_env.split(",")]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
