@@ -37,12 +37,21 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_BASE_URL}/analyze`, inputs);
+      const url = `${API_BASE_URL}/analyze`.replace(/\/+/g, '/').replace(':/', '://');
+      const response = await axios.post(url, inputs, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       setAnalysisResult(response.data);
     } catch (err) {
       let errorMessage = 'Failed to analyze climate risk';
       if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
         errorMessage = 'Cannot connect to backend server. Please ensure the backend is running on http://localhost:8000';
+      } else if (err.response?.status === 405) {
+        errorMessage = `Method not allowed. The endpoint ${err.config?.url} may not support POST requests. Check your API URL: ${API_BASE_URL}`;
+      } else if (err.response?.status === 404) {
+        errorMessage = `Endpoint not found. Check your API URL: ${API_BASE_URL}/analyze`;
       } else if (err.response?.data?.detail) {
         errorMessage = err.response.data.detail;
       } else if (err.message) {
@@ -51,6 +60,8 @@ function App() {
       setError(errorMessage);
       setAnalysisResult(null);
       console.error('Analysis error:', err);
+      console.error('Request URL:', err.config?.url);
+      console.error('Response status:', err.response?.status);
     } finally {
       setLoading(false);
     }
