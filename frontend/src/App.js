@@ -7,7 +7,22 @@ import VariableRiskTable from './components/VariableRiskTable';
 import RainfallChart from './components/RainfallChart';
 import AdvisoryPanel from './components/AdvisoryPanel';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Get API URL from env or use defaults
+const getApiBaseUrl = () => {
+  const envUrl = process.env.REACT_APP_API_URL;
+  if (envUrl) {
+    // Ensure protocol is included
+    return envUrl.startsWith('http://') || envUrl.startsWith('https://') 
+      ? envUrl 
+      : `https://${envUrl}`;
+  }
+  // Default based on environment
+  return process.env.NODE_ENV === 'production' 
+    ? 'https://rice-patent-production.up.railway.app' 
+    : 'http://localhost:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 function App() {
   const [inputs, setInputs] = useState({
@@ -37,7 +52,21 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const url = `${API_BASE_URL}/analyze`.replace(/\/+/g, '/').replace(':/', '://');
+      // Ensure URL is properly formatted with protocol
+      let baseUrl = API_BASE_URL.trim();
+      if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+        // If no protocol, assume https for production, http for local
+        baseUrl = process.env.NODE_ENV === 'production' 
+          ? `https://${baseUrl}` 
+          : `http://${baseUrl}`;
+      }
+      // Remove trailing slash
+      baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+      const url = `${baseUrl}/analyze`;
+      
+      console.log('API Base URL:', API_BASE_URL);
+      console.log('Final URL:', url);
+      
       const response = await axios.post(url, inputs, {
         headers: {
           'Content-Type': 'application/json',
@@ -46,22 +75,26 @@ function App() {
       setAnalysisResult(response.data);
     } catch (err) {
       let errorMessage = 'Failed to analyze climate risk';
+      const requestUrl = err.config?.url || 'unknown';
+      
       if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
-        errorMessage = 'Cannot connect to backend server. Please ensure the backend is running on http://localhost:8000';
+        errorMessage = `Cannot connect to backend server at ${requestUrl}. Please check your API URL configuration.`;
       } else if (err.response?.status === 405) {
-        errorMessage = `Method not allowed. The endpoint ${err.config?.url} may not support POST requests. Check your API URL: ${API_BASE_URL}`;
+        errorMessage = `Method not allowed (405). The endpoint ${requestUrl} may not support POST requests. Verify the URL includes https:// protocol.`;
       } else if (err.response?.status === 404) {
-        errorMessage = `Endpoint not found. Check your API URL: ${API_BASE_URL}/analyze`;
+        errorMessage = `Endpoint not found (404). Check your API URL: ${requestUrl}`;
       } else if (err.response?.data?.detail) {
         errorMessage = err.response.data.detail;
       } else if (err.message) {
-        errorMessage = err.message;
+        errorMessage = `${err.message}. URL: ${requestUrl}`;
       }
       setError(errorMessage);
       setAnalysisResult(null);
       console.error('Analysis error:', err);
-      console.error('Request URL:', err.config?.url);
+      console.error('API Base URL:', API_BASE_URL);
+      console.error('Request URL:', requestUrl);
       console.error('Response status:', err.response?.status);
+      console.error('Response data:', err.response?.data);
     } finally {
       setLoading(false);
     }
