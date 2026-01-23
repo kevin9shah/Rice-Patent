@@ -6,8 +6,6 @@ function AdvisoryPanel({ perVariableRisk, explanations }) {
     const advisories = [];
 
     Object.entries(perVariableRisk || {}).forEach(([variable, risk]) => {
-      const explanation = explanations[variable] || '';
-      
       if (risk === 'HIGH_RISK') {
         if (variable === 'rainfall') {
           advisories.push({
